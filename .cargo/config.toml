@@ -1,0 +1,13 @@
+[alias]
+emit = "build --release --target wasm32-unknown-unknown"
+
+[target.wasm32-unknown-unknown]
+rustflags = ["-C", "link-arg=-s"]
+
+[profile.release]
+codegen-units = 1      # generate a single blob of machine instructions
+opt-level = "z"        # optimize for code size
+lto = true             # compile at link time
+debug = false          # no debug symbols/checks
+panic = "abort"        # usually unwind, but that's extra overhead
+overflow-checks = true # enable safety checks for arithmetic operations
