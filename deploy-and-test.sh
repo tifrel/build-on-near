@@ -3,7 +3,7 @@
 cargo test || exit 1
 cargo emit || exit 1
 
-wasm='target/wasm32-unknown-unknown/release/near_buy_me_a_coffee.wasm'
+wasm='target/wasm32-unknown-unknown/release/buy_me_a_coffee_v1.wasm'
 
 near deploy --accountId coffee.tifrel.testnet --wasmFile "$wasm" \
   --initFunction initialize \

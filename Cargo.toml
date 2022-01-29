@@ -1,10 +1,2 @@
-[package]
-name = "near-buy-me-a-coffee"
-version = "0.1.0"
-edition = "2021"
-
-[lib]
-crate-type = ["cdylib"]
-
-[dependencies]
-near-sdk = "3.1.0"
+[workspace]
+members = ["buy-me-a-coffee-v1", "buy-me-a-coffee-v2"]

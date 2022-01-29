@@ -1,0 +1,11 @@
+[package]
+name = "buy-me-a-coffee-v2"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+near-sdk = "3.1.0"
+v1 = { path = "../buy-me-a-coffee-v1", package = "buy-me-a-coffee-v1" }

@@ -8,7 +8,6 @@ function NEAR(x: number): string {
 }
 
 const workspace = Workspace.init(async ({ root }) => {
-  // Create a subaccounts
   const someone = await root.createAccount("someone", {
     initialBalance: NEAR(5),
   });
@@ -16,33 +15,22 @@ const workspace = Workspace.init(async ({ root }) => {
     initialBalance: NEAR(5),
   });
 
-  // Deploy contract
-  const contract = await root.createAndDeploy(
-    // Subaccount name
-    "coffee",
-
-    // Relative path (from package.json location) to the compiled contract
-    "../target/wasm32-unknown-unknown/release/near_buy_me_a_coffee.wasm",
-
-    // Optional: specify initialization
-    {
-      method: "initialize",
-      args: { owner: root.accountId },
-    }
-  );
-
-  // Make things accessible in tests
-  return { root, someone, sometwo, contract };
+  return { root, someone, sometwo };
 });
 
 workspace.test(
-  "BuyMeACoffee works",
-  async (test, { contract, root, someone, sometwo }) => {
+  "BuyMeACoffee migration works",
+  async (test, { root, someone, sometwo }) => {
+    // Deploy contract
+    let contract = await root.createAndDeploy(
+      "coffee",
+      "../target/wasm32-unknown-unknown/release/buy_me_a_coffee_v1.wasm",
+      { method: "initialize", args: { owner: root.accountId } }
+    );
     const topCoffeeBuyer = async () => contract.view("top_coffee_buyer", {});
 
     // First coffee bought
     await someone.call(contract, "buy_coffee", {}, { attachedDeposit: NEAR(1) });
-    test.log("Deposited!");
     test.is(
       await contract.view("coffee_near_from", { account: someone.accountId }),
       intNEAR(1)
@@ -56,5 +44,29 @@ workspace.test(
       parseInt(NEAR(2))
     );
     test.deepEqual(await topCoffeeBuyer(), [sometwo.accountId, intNEAR(2)]);
+
+    // Perform migration
+    const tx = (
+      await contract
+        .createTransaction(contract)
+        .deployContractFile(
+          "../target/wasm32-unknown-unknown/release/buy_me_a_coffee_v2.wasm"
+        )
+    ).functionCall("migrate", {});
+    await tx.signAndSend();
+
+    // Existing state/methods are untouched
+    test.is(
+      await contract.view("coffee_near_from", { account: someone.accountId }),
+      parseInt(NEAR(1))
+    );
+    test.is(
+      await contract.view("coffee_near_from", { account: sometwo.accountId }),
+      parseInt(NEAR(2))
+    );
+    test.deepEqual(await topCoffeeBuyer(), [sometwo.accountId, intNEAR(2)]);
+
+    const topCoffeeBought = async () => contract.view("top_coffee_bought", {});
+    test.deepEqual(await topCoffeeBought(), null);
   }
 );
