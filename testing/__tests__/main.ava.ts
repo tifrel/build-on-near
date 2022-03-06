@@ -28,32 +28,32 @@ workspace.test(
   async (test, { root, outer, innerA, innerB }) => {
     const xccA = await root.call_raw(
       outer,
-      "dispatch_call",
+      "deposit_call",
       {
         account: innerA.accountId,
         method: "deposit",
-        args: JSON.stringify({ msg: "Call to A" }),
+        msg: "Call to A",
       },
       { attachedDeposit: NEAR(1) }
     );
     test.deepEqual(xccA.logs, [
-      `Dispatching call: ${innerA.accountId}.deposit({"msg":"Call to A"})`,
+      `Dispatching call: ${innerA.accountId}.deposit({msg: "Call to A"})`,
       `${innerA.accountId}: Call to A (deposit: ${NEAR(1)})`,
     ]);
     test.is(xccA.parseResult<string>(), NEAR(1));
 
     const xccB = await root.call_raw(
       outer,
-      "dispatch_call",
+      "deposit_call",
       {
         account: innerB.accountId,
         method: "deposit",
-        args: JSON.stringify({ msg: "Call to B" }),
+        msg: "Call to B",
       },
       { attachedDeposit: NEAR(2) }
     );
     test.deepEqual(xccB.logs, [
-      `Dispatching call: ${innerB.accountId}.deposit({"msg":"Call to B"})`,
+      `Dispatching call: ${innerB.accountId}.deposit({msg: "Call to B"})`,
       `${innerB.accountId}: Call to B (deposit: ${NEAR(2)})`,
     ]);
     test.is(xccB.parseResult<string>(), NEAR(2));

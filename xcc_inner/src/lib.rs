@@ -1,6 +1,6 @@
 use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
 use near_sdk::json_types::U128;
-use near_sdk::{env, near_bindgen, Balance};
+use near_sdk::{env, log, near_bindgen, Balance};
 
 #[near_bindgen]
 #[derive(Default, BorshDeserialize, BorshSerialize)]
@@ -16,9 +16,7 @@ impl DepositLogger {
     self.deposited += deposit;
 
     let self_name = env::current_account_id();
-    env::log(
-      &format!("{}: {} (deposit: {})", self_name, msg, deposit).as_bytes(),
-    );
+    log!("{}: {} (deposit: {})", self_name, msg, deposit);
 
     self.get_deposited()
   }
