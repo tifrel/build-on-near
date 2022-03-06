@@ -1,0 +1,10 @@
+[package]
+name = "xcc_inner"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+near-sdk = "3.1.0"
